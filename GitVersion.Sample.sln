@@ -8,7 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{D5754B43-A847-4FAD-ADC7-B5F63E551DBD}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
-		gitversion.yml = gitversion.yml
+		GitVersion.yml = GitVersion.yml
 		README.md = README.md
 	EndProjectSection
 EndProject
