@@ -4,6 +4,6 @@ namespace GitVersion.Sample
 {
     public class Class1
     {
-        // feature/foo2 .
+        // feature/foo2 ..
     }
 }
