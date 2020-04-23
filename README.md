@@ -1,0 +1,1 @@
+https://gitversion.net/docs/reference/versioning-modes/mainline-development
