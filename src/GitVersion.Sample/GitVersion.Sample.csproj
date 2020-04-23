@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>GitVersion.Sample</AssemblyName>
+    <RootNamespace>GitVersion.Sample</RootNamespace>
+    <PackageId>GitVersion.Sample</PackageId>
+    <Description></Description>
+    <Company></Company>
+    <Copyright></Copyright>
+    <PackageProjectUrl>https://github.com/vip32/gitversion-sample</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+  </PropertyGroup>
+</Project>
