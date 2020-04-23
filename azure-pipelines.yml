@@ -1,75 +1,77 @@
 variables:
-  - group: vars
-  - name: buildConfiguration
-    value: 'Release'
+- group: vars # azure pipelines variable group https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azdevops&tabs=yaml
+- name: buildConfiguration
+  value: 'Release'
 
-  trigger:
-  - master
-  - develop
+trigger:
+- master
+- develop
+- release/*
+- feature/*
 
-  pool:
-    vmImage: 'ubuntu-latest'
+pool:
+  vmImage: 'ubuntu-latest'
 
-  steps:
-  - task: GitVersion@5
-    displayName: Apply git version
+steps:
+- task: GitVersion@5
+  displayName: Apply git version
 
-  - task: UseDotNet@2
-    displayName: Install dotnet SDK
-    inputs:
-      version: '3.1.x'
-      packageType: sdk
+- task: UseDotNet@2
+  displayName: Install dotnet SDK
+  inputs:
+    version: '3.1.x'
+    packageType: sdk
 
-  - task: DotNetCoreCLI@2
-    displayName: Restore project dependencies
-    inputs:
-      command: restore
-      projects: '**/*.csproj'
-      verbosityRestore: Normal
+- task: DotNetCoreCLI@2
+  displayName: Restore project dependencies
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+    verbosityRestore: Normal
 
-  - task: DotNetCoreCLI@2
-    displayName: Build projects
-    inputs:
-      projects: '**/*.sln'
-      arguments: '--configuration $(buildConfiguration) /p:Version=$(GitVersion.NuGetVersionV2);AssemblyVersion=$(GitVersion.AssemblySemVer);FileVersion=$(GitVersion.AssemblySemVer);InformationalVersion=$(GitVersion.InformationalVersion)'
+- task: DotNetCoreCLI@2
+  displayName: Build projects
+  inputs:
+    projects: '**/*.sln'
+    arguments: '--configuration $(buildConfiguration) /p:Version=$(GitVersion.NuGetVersionV2);AssemblyVersion=$(GitVersion.AssemblySemVer);FileVersion=$(GitVersion.AssemblySemVer);InformationalVersion=$(GitVersion.InformationalVersion)'
 
-  - task: DotNetCoreCLI@2
-    displayName: Run unit tests
-    enabled: false
-    inputs:
-      command: test
-      projects: '**/*[Tt]ests/*UnitTests.csproj'
-      arguments: '--configuration $(buildConfiguration) --no-restore --no-build'
+- task: DotNetCoreCLI@2
+  displayName: Run unit tests
+  enabled: false
+  inputs:
+    command: test
+    projects: '**/*[Tt]ests/*UnitTests.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-restore --no-build'
 
-  - task: DotNetCoreCLI@2
-    displayName: Package nuget packages
-    inputs:
-      command: pack
-      configuration: $(buildConfiguration)
-      packagesToPack: '**/*.csproj'
-      nobuild: true
-      packDirectory: '$(Build.ArtifactStagingDirectory)'
-      buildProperties: 'Version=$(GitVersion.NuGetVersion)'
-      verbosityPack: Normal
+- task: DotNetCoreCLI@2
+  displayName: Package nuget packages
+  inputs:
+    command: pack
+    configuration: $(buildConfiguration)
+    packagesToPack: '**/*.csproj'
+    nobuild: true
+    packDirectory: '$(Build.ArtifactStagingDirectory)'
+    buildProperties: 'Version=$(GitVersion.NuGetVersion)'
+    verbosityPack: Normal
 
-  - task: DotNetCoreCLI@2
-    displayName: Push nuget packages # https://github.com/Microsoft/azure-pipelines-tasks/issues/7160#issuecomment-509044113
-    enabled: false
-    inputs:
-      command: custom
-      custom: nuget
-      arguments: >
-        push $(Build.ArtifactStagingDirectory)/*.nupkg
-        --source https://api.nuget.org/v3/index.json
-        --api-key $(NuGetSourceServerApiKey)
-        --no-symbols
-        --skip-duplicate
+- task: DotNetCoreCLI@2
+  enabled: false
+  displayName: Push nuget packages # https://github.com/Microsoft/azure-pipelines-tasks/issues/7160#issuecomment-509044113
+  inputs:
+    command: custom
+    custom: nuget
+    arguments: >
+      push $(Build.ArtifactStagingDirectory)/*.nupkg
+      --source https://api.nuget.org/v3/index.json
+      --api-key $(NuGetSourceServerApiKey)
+      --no-symbols
+      --skip-duplicate
 
-  #- task: DotNetCoreCLI@2 $(NuGetSourceServerApiKey)
-  #  displayName: Push nuget
-  #  inputs:
-  #    command: push
-  #    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-  #    nobuild: true
-  #    nuGetFeedType: 'external'
-  #    publishFeedCredentials: 'nuget' # service connection name DOES NOT WORK!
+#- task: DotNetCoreCLI@2 $(NuGetSourceServerApiKey)
+#  displayName: Push nuget
+#  inputs:
+#    command: push
+#    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+#    nobuild: true
+#    nuGetFeedType: 'external'
+#    publishFeedCredentials: 'nuget' # service connection name DOES NOT WORK!
